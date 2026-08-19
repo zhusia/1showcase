@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>1ShowcaseTool</title>
+    <style>
+      /**
+       * THE ONE SURFACE THAT SPANS BOTH PHASES.
+       *
+       * The popup is the switchboard: start a recording *or* follow a guide. Those are the two
+       * halves src/styles/00-tokens.css keeps apart, and a control here has to say without being
+       * read which half it belongs to.
+       *
+       *   record #e8453f  → recording. Something irreversible is about to be captured.
+       *   brand  #22b8d6  → following. A guide is about to drive your browser.
+       *
+       * The pairing carries more weight here than anywhere else in the product, because it is the
+       * only screen where both are on offer. It also survives the rebrand intact: the app now has
+       * exactly one accent and exactly one warm hue, so "warm means you are about to destroy
+       * something" is a rule with no competing example anywhere else to dilute it.
+       *
+       * Tokens duplicated from the app: the extension is a third TS project that cannot reach
+       * src/, the same reason redactionPatterns.ts is duplicated. Keep in sync.
+       */
+      :root {
+        color-scheme: dark;
+        --bg: #0b0e14;
+        --sunken: #070a0e;
+        --surface: #131a24;
+        --surface-hover: #1a222e;
+        --line: #1e2733;
+        --line-strong: #2e3b4a;
+        --fg: #e6edf3;
+        --fg-muted: #93a1ae;
+        --fg-subtle: #77848f;
+        --brand: #22b8d6;
+        --brand-highlight: #5ee0f5;
+        --record: #e8453f;
+        --record-hover: #f1615a;
+        /* Ink on a filled record or brand block. Dark in both cases — white fails on each. */
+        --on-fill: #0b0e14;
+        --danger: #e8453f;
+        --danger-fg: #ff9e96;
+        --danger-line: rgba(232, 69, 63, 0.46);
+        --good: #3bc46e;
+        --instrument: 'Bahnschrift', 'Avenir Next Condensed', 'Roboto Condensed', 'Segoe UI', sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        width: 328px;
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font: 13px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+
+      /* -------------------------------------------------- connection status */
+
+      /**
+       * Neutral chrome: whether the desktop app is reachable belongs to neither phase. A
+       * filled block rather than a dot-and-label, because fill is the language the rest of
+       * the product speaks.
+       */
+      .bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: var(--sunken);
+        border-bottom: 1px solid var(--line);
+      }
+
+      /**
+       * The official icon, inline — the popup is a chrome-extension:// page and an <img>
+       * would be a second request for 900 bytes. Copied from
+       * assets/brand/1showcasetool-icon-default.svg; a change there is a change here, the same
+       * duplication rule the tokens above follow.
+       */
+      .brand-mark {
+        width: 16px;
+        height: 16px;
+        display: block;
+        flex: 0 0 auto;
+      }
+
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 1px;
+        background: var(--fg-subtle);
+        flex: 0 0 auto;
+      }
+      .dot.on { background: var(--good); }
+      .dot.rec { background: var(--record); }
+
+      #appstate {
+        font-family: var(--instrument);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+      }
+
+      .body { padding: 13px 14px 14px; }
+
+      /* ------------------------------------------------------------ sections */
+
+      /**
+       * Each zone carries a 2px leading edge in its phase colour — the same spine the desktop
+       * app uses. It is the only place the colour appears, so a control's allegiance is never
+       * ambiguous.
+       */
+      .zone {
+        position: relative;
+        padding-left: 11px;
+        margin-bottom: 14px;
+      }
+      .zone::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 1px;
+        bottom: 1px;
+        width: 2px;
+        background: var(--zone, var(--line-strong));
+      }
+      .zone-record { --zone: var(--record); }
+      .zone-follow { --zone: var(--brand); }
+
+      label,
+      .zone-label {
+        display: block;
+        font-family: var(--instrument);
+        font-size: 10.5px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.13em;
+        color: var(--fg-subtle);
+        margin: 0 0 6px;
+      }
+
+      .state { color: var(--fg-muted); font-size: 12px; margin: 0 0 10px; }
+      .empty { color: var(--fg-subtle); font-size: 12px; margin: 0 0 8px; }
+      .err { color: var(--danger-fg); font-size: 12px; margin: 0 0 10px; }
+
+      input {
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        color: var(--fg);
+        font: inherit;
+        padding: 7px 9px;
+        margin-bottom: 9px;
+      }
+      input:focus-visible { outline: 2px solid var(--brand-highlight); outline-offset: 1px; border-color: transparent; }
+
+      button {
+        width: 100%;
+        font: inherit;
+        font-weight: 500;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        padding: 8px 11px;
+        cursor: pointer;
+        margin-bottom: 6px;
+      }
+      button:focus-visible { outline: 2px solid var(--brand-highlight); outline-offset: 2px; }
+
+      /** Primary means "start recording" here, so it wears the record phase's colour. */
+      button.primary { background: var(--record); color: var(--on-fill); font-weight: 650; }
+      button.primary:hover { background: var(--record-hover); }
+      button.danger { background: var(--danger); color: var(--on-fill); }
+      button.ghost { background: transparent; color: var(--fg-muted); border-color: var(--line); }
+      button.ghost:hover { color: var(--fg); border-color: var(--line-strong); }
+      button:disabled { opacity: 0.42; cursor: not-allowed; }
+
+      hr { border: none; border-top: 1px solid var(--line); margin: 13px 0; }
+
+      /* ------------------------------------------------------------- guides */
+
+      .guides { max-height: 176px; overflow-y: auto; margin: 0; padding: 0; list-style: none; }
+      .guides li { margin-bottom: 5px; display: flex; gap: 5px; }
+      .guides button {
+        text-align: left;
+        margin: 0;
+        display: block;
+        flex: 1 1 auto;
+        min-width: 0;
+        background: var(--surface);
+        color: var(--fg);
+        border-color: var(--line);
+        border-left: 2px solid var(--brand);
+        border-radius: 4px;
+      }
+      .guides button:hover { background: var(--surface-hover); }
+      .guides small { display: block; color: var(--fg-muted); font-size: 11px; }
+      /* The Maker's own dry run — neutral chrome, since it belongs to neither phase edge. */
+      .guides .guide-check { flex: 0 0 auto; border-left-color: var(--line); color: var(--fg-muted); font-size: 11px; }
+
+      /* -------------------------------------------------------------- sites */
+
+      .sites { max-height: 136px; overflow-y: auto; margin: 0; padding: 0; list-style: none; }
+      .sites li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 6px 9px;
+        margin-bottom: 5px;
+      }
+      .site-host {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 12.5px;
+      }
+      .site-remove {
+        flex: 0 0 auto;
+        width: auto;
+        margin: 0;
+        padding: 3px 8px;
+        font-size: 11.5px;
+        background: transparent;
+        color: var(--fg-muted);
+        border-color: var(--line);
+      }
+      .site-remove:hover { color: var(--danger-fg); border-color: var(--danger-line); }
+    </style>
+  </head>
+  <body>
+    <div class="bar">
+      <svg class="brand-mark" viewBox="0 0 1024 1024" role="img" aria-label="1ShowcaseTool" focusable="false">
+        <defs>
+          <linearGradient id="gt-face" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#4FD6EE" />
+            <stop offset="1" stop-color="#0E7FB4" />
+          </linearGradient>
+          <!-- A <g> here would be dropped as an illegal clipPath child, the clip would resolve
+               to empty, and every clipped child below it would vanish — leaving a bare plate
+               that looks like a styling bug. The scale rides on the path. -->
+          <clipPath id="gt-body" clipPathUnits="userSpaceOnUse">
+            <path
+              transform="scale(6.4)"
+              d="M38,0 H122 C146,0 160,14 160,38 V122 C160,146 146,160 122,160 H38 C14,160 0,146 0,122 V38 C0,14 14,0 38,0 Z"
+            />
+          </clipPath>
+        </defs>
+        <g transform="scale(6.4)">
+          <path
+            d="M38,0 H122 C146,0 160,14 160,38 V122 C160,146 146,160 122,160 H38 C14,160 0,146 0,122 V38 C0,14 14,0 38,0 Z"
+            fill="url(#gt-face)"
+          />
+        </g>
+        <g clip-path="url(#gt-body)">
+          <g transform="scale(6.4)">
+            <path d="M0,0 H160 V66 Q80,92 0,66 Z" fill="#FFFFFF" opacity="0.14" />
+            <path
+              d="M38,0 H122 C146,0 160,14 160,38 V122 C160,146 146,160 122,160 H38 C14,160 0,146 0,122 V38 C0,14 14,0 38,0 Z"
+              fill="none"
+              stroke="#FFFFFF"
+              stroke-opacity="0.30"
+              stroke-width="2.4"
+            />
+            <g transform="translate(80,80) scale(1.18) translate(-80,-80)">
+              <rect x="48" y="44" width="9" height="72" rx="4.5" fill="#FFFFFF" />
+              <path d="M61,50 L108,68 L61,86 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="9" stroke-linejoin="round" />
+            </g>
+          </g>
+        </g>
+      </svg>
+      <span class="dot" id="dot"></span><span id="appstate">Checking…</span>
+    </div>
+    <div class="body">
+      <p class="err" id="err" hidden></p>
+      <div id="panel"></div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

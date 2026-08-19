@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: ogt-local-file:; media-src 'self' gtmedia:; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <title>1ShowcaseTool</title>
+    <!--
+      The official icon, inline. A favicon is fetched under img-src, and this page loads from
+      file:// in the packaged app where 'self' is an opaque origin — a `./icon.svg` beside the
+      bundle would be refused there and nowhere else, which is the worst kind of bug to find.
+      A data: URI is already allowed by the CSP above. Generated from
+      assets/brand/1showcasetool-icon-default.svg; single quotes and %23 for # are the only edits.
+    -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='1024' height='1024' viewBox='0 0 1024 1024'><defs><linearGradient id='face' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%234FD6EE'/><stop offset='1' stop-color='%230E7FB4'/></linearGradient><clipPath id='body' clipPathUnits='userSpaceOnUse'><path transform='scale(6.4)' d='M38,0 H122 C146,0 160,14 160,38 V122 C160,146 146,160 122,160 H38 C14,160 0,146 0,122 V38 C0,14 14,0 38,0 Z'/></clipPath></defs><g transform='scale(6.4)'><path d='M38,0 H122 C146,0 160,14 160,38 V122 C160,146 146,160 122,160 H38 C14,160 0,146 0,122 V38 C0,14 14,0 38,0 Z' fill='url(%23face)'/></g><g clip-path='url(%23body)'><g transform='scale(6.4)'><path d='M0,0 H160 V66 Q80,92 0,66 Z' fill='%23FFFFFF' opacity='0.14'/><path d='M38,0 H122 C146,0 160,14 160,38 V122 C160,146 146,160 122,160 H38 C14,160 0,146 0,122 V38 C0,14 14,0 38,0 Z' fill='none' stroke='%23FFFFFF' stroke-opacity='0.30' stroke-width='2.4'/><g transform='translate(80,80) scale(1.18) translate(-80,-80)'><rect x='48' y='44' width='9' height='72' rx='4.5' fill='%23FFFFFF'/><path d='M61,50 L108,68 L61,86 Z' fill='%23FFFFFF' stroke='%23FFFFFF' stroke-width='9' stroke-linejoin='round'/></g></g></g></svg>"
+    />
+    <script type="module" crossorigin src="./assets/index-C5U4l-2a.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-ByIl-g7L.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

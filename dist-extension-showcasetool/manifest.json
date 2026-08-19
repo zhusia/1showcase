@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "1ShowcaseTool",
+  "version": "0.1.0",
+  "description": "Record a setup flow once and turn it into a guide your users can follow, with live correction.",
+  "minimum_chrome_version": "120",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "1ShowcaseTool"
+  },
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "permissions": ["activeTab", "scripting", "storage", "tabs"],
+  "optional_host_permissions": ["https://*/*", "http://localhost/*"],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "https://console.cloud.google.com/*",
+    "https://search.google.com/*",
+    "https://developers.facebook.com/*",
+    "https://developer.x.com/*",
+    "https://www.linkedin.com/developers/*",
+    "https://www.reddit.com/prefs/*",
+    "https://developers.pinterest.com/*",
+    "https://app.dataforseo.com/*",
+    "https://hashnode.com/*",
+    "https://dev.to/*"
+  ]
+}
